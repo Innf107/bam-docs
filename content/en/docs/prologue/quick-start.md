@@ -1,7 +1,7 @@
 ---
-title: "Quick Start"
-description: "One page summary of how to start a new Doks project."
-lead: "One page summary of how to start a new Doks project."
+title: "Language Reference"
+description: "BAM! is a language based on the concept of streams and machines that transform streams."
+lead: "BAM! is a language based on the concept of streams and machines that transform streams."
 date: 2020-11-16T13:59:39+01:00
 lastmod: 2020-11-16T13:59:39+01:00
 draft: false
@@ -13,63 +13,88 @@ weight: 110
 toc: true
 ---
 
-## Requirements
+BAM! files consist of a list of machine definitions. 
 
-- [Git](https://git-scm.com/) — latest source release
-- [Node.js](https://nodejs.org/) — latest LTS version or newer
+Machines are named stream transformers, that transform streams using other machines.
 
-{{< details "Why Node.js?" >}}
+Every machine has exactly one (implicit) input stream called `input` and produces exactly one output stream.
 
-## Start a new Doks project
+## Basic stream manipulation
 
-Create a new site, change directories, install dependencies, and start development server.
-
-### Create a new site
-
-Doks is available as a child theme and a starter theme.
-
-#### Child theme
-
-- Intended for novice to intermediate users
-- Intended for minor customizations
-
-```bash
-git clone https://github.com/h-enk/doks-child-theme.git my-doks-site
+The simplest possible machine is one that simply passes its input stream on without performing any transformations.
+```
+machine IdentityMachine {
+    input
+}
 ```
 
-#### Starter theme
+To get more useful machines, streams can be transformed by piping them into other machines. For example, a machine that produces the square roots of the elements in its input stream might be written like this.
 
-- Intended for intermediate to advanced users
-- Intended for major customizations
-
-```bash
-git clone https://github.com/h-enk/doks.git my-doks-site
+```
+machine CustomSquareRoot {
+  input -> Sqrt
+}
 ```
 
-{{< details "Help me choose" >}}
-Not sure which one is for you? Pick the child theme.
-{{< /details >}}
+`CustomSquareRoot` is now equivalent to `Sqrt`.
 
-### Change directories
+Of course, the output of such a pipe expression is still a stream, so pipes can be chained
 
-```bash
-cd my-doks-site
+```
+machine FourthRoot {
+  input -> Sqrt -> Sqrt
+} 
 ```
 
-### Install dependencies
+Numeric and string literals evaluate to a constant, but infinite stream of their values.
 
-```bash
-npm install
+```
+machine ConstSqrt2 {
+  2 -> Sqrt
+}
+```
+`ConstSqrt2` ignores its input and always returns an infinite stream of `1.4142135623730951`.
+
+## Combining streams
+Some machines, e.g. `Add`, take streams of pairs. To create these, streams can be paired up, by joining them with a comma.
+
+```
+machine PlusFive {
+  input, 5 -> Add
+}
 ```
 
-### Start development server
+The combined streams can also be more complex stream expressions and parentheses can be used to specify the order of operations. `,` always has a higher precedence than `->`.
 
-```bash
-npm run start
+```
+machine ComplexMaths {
+  (input, 5 -> Add), (4, 1 -> Sub) -> Mul -> Sqrt
+}
 ```
 
-Doks will start the Hugo development webserver accessible by default at `http://localhost:1313`. Saved changes will live reload in the browser.
+## Stream variables
+Piping into machines and building pairs can already compute a lot, but this can quickly get unwieldy. 
+Intermediate streams can be bound to variables via `let` statements. This makes it possible to split up code and give streams meaningful names.
 
-## Other commands
+```
+machine LessComplexMaths {
+  let x = (input, 5 -> Add);
+  let y = (4, 1 -> Sub);
+  x, y -> Mul -> Sqrt
+}
+```
 
-Doks comes with commands for common tasks. [Commands →]({{< relref "commands" >}})
+Let expressions are able to bind more than a single variable. In this case, they expect the stream to return a tuple and destructure the stream, by splitting it up into distinct streams for input elements. 
+
+This is comparable to tuple destructuring in other languages, though an important difference is that the destructured streams might be drained at different times.
+
+```
+machine Destructuring {
+  let input1, input2 = input -> Dup2; // Dup2 : ∀a. a -> (a, a)
+  (input1, 1 -> Add), (input2, 1 -> Sub) -> Add
+}
+```
+
+Duplicating values with `Dup2` and then destructuring them might seem pointless, but the reason this is necessary is that streams must be used linearly, i.e. the same stream can never be used twice. (This is currently **not** checked!)
+
+## Conditionals

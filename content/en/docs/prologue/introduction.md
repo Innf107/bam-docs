@@ -1,7 +1,7 @@
 ---
 title: "Introduction"
-description: "One page summary of how to start a new Doks project."
-lead: "One page summary of how to start a new Doks project."
+description: "Installation and basic usage instructions"
+lead: "Installation and basic usage instructions"
 date: 2020-11-16T13:59:39+01:00
 lastmod: 2020-11-16T13:59:39+01:00
 draft: false
@@ -13,63 +13,31 @@ weight: 110
 toc: true
 ---
 
-## Requirements
+## Installation
 
-- [Git](https://git-scm.com/) — latest source release
-- [Node.js](https://nodejs.org/) — latest LTS version or newer
-
-{{< details "Why Node.js?" >}}
-
-## Start a new Doks project
-
-Create a new site, change directories, install dependencies, and start development server.
-
-### Create a new site
-
-Doks is available as a child theme and a starter theme.
-
-#### Child theme
-
-- Intended for novice to intermediate users
-- Intended for minor customizations
+Make sure you have [cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) installed
 
 ```bash
-git clone https://github.com/h-enk/doks-child-theme.git my-doks-site
+git clone https://github.com/langjam/jam0003
+cargo install --path jam0003/bam
 ```
 
-#### Starter theme
-
-- Intended for intermediate to advanced users
-- Intended for major customizations
-
+To verify the installation, run
 ```bash
-git clone https://github.com/h-enk/doks.git my-doks-site
+bam --help
 ```
 
-{{< details "Help me choose" >}}
-Not sure which one is for you? Pick the child theme.
-{{< /details >}}
+## Usage
+In BAM!, every stream is infinite, so 'running a file' does not really make sense. 
+Instead, running `bam <file>` loads a file in the REPL for interactive evaluation.
 
-### Change directories
+It is also possible to add definitions inside the repl by entering 'definition mode' with `:d`.
 
-```bash
-cd my-doks-site
-```
+When entering a stream expression, the REPL enters 'stream mode'. Press `enter` to advance the stream by one element.
 
-### Install dependencies
+All modes can be exited with `Ctrl + D`.
 
-```bash
-npm install
-```
+*Warning:* currently, stream expressions entered at the REPL are **not** typechecked. This will be fixed in a later version. 
 
-### Start development server
+All definitions, entered at the REPL or loaded from a file, are fully typechecked. This only applies to stream expressions.
 
-```bash
-npm run start
-```
-
-Doks will start the Hugo development webserver accessible by default at `http://localhost:1313`. Saved changes will live reload in the browser.
-
-## Other commands
-
-Doks comes with commands for common tasks. [Commands →]({{< relref "commands" >}})
