@@ -97,4 +97,34 @@ machine Destructuring {
 
 Duplicating values with `Dup2` and then destructuring them might seem pointless, but the reason this is necessary is that streams must be used linearly, i.e. the same stream can never be used twice. (This is currently **not** checked!)
 
+In order to use a stream twice, you have to pass it to `Dup2` or `Dup3` and destructure the resulting stream.
+
 ## Conditionals
+Of course, no useful programming language is complete without branching.
+
+Conditionals are achieved via `stream ? stream : stream` expressions, similar to the ternary conditional operator in many C-inspired languages. 
+
+```
+machine TotallyNonOverusedExample {
+  let age = input;
+  (age, 18 -> Le) 
+    ? "Too young" 
+    : "Ok"
+}
+```
+
+Importantly, this operator first drains an element from the first stream and, depending on this, drains an element from **only one** of the other streams. This distinction is crucial if one of the stream produces side effects (e.g. if it uses `Print` or `Read`).
+
+## Recursion
+Machines can be used in their own definition. You can imagine this as a machine feeding one of its output conveyor belts back into its input.
+
+```
+machine Fib {
+  let input_check, input_rec1, input_rec2 = input -> Dup3;
+
+  (input_check, 2 -> Lt)
+      ? 1
+      : ((input_rec1, 1 -> Sub -> Fib), (input_rec2, 2 -> Sub -> Fib)) -> Add
+
+}
+```
