@@ -37,7 +37,11 @@ When entering a stream expression, the REPL enters 'stream mode'. Press `enter` 
 
 All modes can be exited with `Ctrl + D`.
 
-*Warning:* currently, stream expressions entered at the REPL are **not** typechecked. This will be fixed in a later version. 
 
-All definitions, entered at the REPL or loaded from a file, are fully typechecked. This only applies to stream expressions.
+## Known Issues
+
+Currently, stream expressions entered at the REPL are **not** typechecked. This will be fixed in a later version. 
+All *definitions*, entered at the REPL or loaded from a file, are fully typechecked and inferred. This only applies to stream expressions entered at the REPL.
+
+There is a bug in the interpreter where some valid expressions will fail to evaluate and print *Cannot access streams*.
 
