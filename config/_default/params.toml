@@ -3,7 +3,7 @@
 ## Homepage
 title = "BAM!"
 titleSeparator = "-"
-titleAddition = "Beautiful Assembly Machines"
+titleAddition = "Beautifully Assembled Machines"
 description = "BAM! is a language based on the concept of streams and machines that transform streams."
 
 ## Documentation
